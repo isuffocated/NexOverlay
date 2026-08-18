@@ -1,0 +1,208 @@
+<UserControl x:Class="NexOverlay.App.WelcomeWizardView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             FontFamily="/NexOverlay.App;component/Assets/Fonts/#Copperplate"
+             IsHitTestVisible="True">
+        <UserControl.Resources>
+        <Style x:Key="NexOverlayWizardButtonStyle"
+               TargetType="Button">
+            <Setter Property="Height" Value="38"/>
+            <Setter Property="MinWidth" Value="92"/>
+            <Setter Property="Padding" Value="18,0"/>
+            <Setter Property="Foreground" Value="#EAF5FF"/>
+            <Setter Property="Background" Value="#2436495C"/>
+            <Setter Property="BorderBrush" Value="#5D7EA7D2"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Root"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="8"
+                                SnapsToDevicePixels="True">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"
+                                              Margin="2"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Root" Property="Background" Value="#2D455D77"/>
+                                <Setter TargetName="Root" Property="BorderBrush" Value="#86B8E6FF"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Root" Property="Background" Value="#37516C84"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="Root" Property="Background" Value="#1A263241"/>
+                                <Setter TargetName="Root" Property="BorderBrush" Value="#31485E78"/>
+                                <Setter Property="Foreground" Value="#93B8D4E8"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+
+    <Border
+        Width="540"
+        MinHeight="315"
+        Padding="26"
+        CornerRadius="26"
+        Background="#FE0D1219"
+        BorderBrush="#68A9D8FF"
+        BorderThickness="1">
+
+        <Border.Effect>
+            <DropShadowEffect
+                Color="#A9D8FF"
+                BlurRadius="46"
+                ShadowDepth="0"
+                Opacity="0.38"
+                RenderingBias="Performance"/>
+        </Border.Effect>
+
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="20"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="22"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="14"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <Border
+                    Width="54"
+                    Height="54"
+                    CornerRadius="17"
+                    Background="#18202A35"
+                    BorderBrush="#64A9D8FF"
+                    BorderThickness="1">
+
+                    <TextBlock
+                        x:Name="StepGlyph"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Foreground="#F0A9D8FF"
+                        FontSize="18"
+                        FontWeight="SemiBold"/>
+                </Border>
+
+                <StackPanel Grid.Column="2"
+                            VerticalAlignment="Center">
+
+                    <TextBlock
+                        Text="NEXOVERLAY TOUR"
+                        Foreground="#66FFFFFF"
+                        FontSize="10"/>
+
+                    <TextBlock
+                        x:Name="StepTitle"
+                        Margin="0,4,0,0"
+                        Foreground="#F6FFFFFF"
+                        FontSize="18"
+                        FontWeight="SemiBold"
+                        TextWrapping="Wrap"/>
+                </StackPanel>
+
+                <Button
+                    Grid.Column="3"
+                    Width="60"
+                    Height="32"
+                    Background="#14FFFFFF"
+                    BorderBrush="#30FFFFFF"
+                    BorderThickness="1"
+                    Foreground="#AFFFFFFF"
+                    Cursor="Hand"
+                    Click="SkipButton_OnClick">
+
+                    <TextBlock Text="SKIP"
+                               FontSize="9"/>
+                </Button>
+            </Grid>
+
+            <StackPanel Grid.Row="2">
+                <TextBlock
+                    x:Name="StepBody"
+                    Foreground="#B8FFFFFF"
+                    FontSize="13"
+                    LineHeight="21"
+                    TextWrapping="Wrap"/>
+
+                <Border
+                    Margin="0,18,0,0"
+                    Padding="14,12"
+                    CornerRadius="13"
+                    Background="#10182028"
+                    BorderBrush="#2EFFFFFF"
+                    BorderThickness="1">
+
+                    <TextBlock
+                        x:Name="StepTip"
+                        Foreground="#D0FFFFFF"
+                        FontSize="11"
+                        LineHeight="18"
+                        TextWrapping="Wrap"/>
+                </Border>
+            </StackPanel>
+
+            <Grid Grid.Row="4">
+                <StackPanel
+                    x:Name="DotsPanel"
+                    Orientation="Horizontal"
+                    VerticalAlignment="Center"/>
+
+                <StackPanel
+                    HorizontalAlignment="Right"
+                    Orientation="Horizontal">
+
+                    <Button
+                        x:Name="BackButton"
+                        FontSize="12"
+                        Style="{StaticResource NexOverlayWizardButtonStyle}"
+                        Width="92"
+                        Height="38"
+                        Margin="0,0,10,0"
+                        Background="#14FFFFFF"
+                        BorderBrush="#32FFFFFF"
+                        BorderThickness="1"
+                        Foreground="#D8FFFFFF"
+                        Click="BackButton_OnClick">
+
+                        <TextBlock Text="BACK"
+                                   FontSize="9"/>
+                    </Button>
+
+                    <Button
+                        Width="124"
+                        Height="38"
+                        Background="#2EA9D8FF"
+                        BorderBrush="#88A9D8FF"
+                        BorderThickness="1"
+                        Foreground="#F5FFFFFF"
+                        Click="NextButton_OnClick">
+
+                        <TextBlock
+                            x:Name="NextButtonText"
+                            Text="NEXT"
+                            FontSize="9"
+                            FontWeight="SemiBold"/>
+                    </Button>
+                </StackPanel>
+            </Grid>
+        </Grid>
+    </Border>
+</UserControl>

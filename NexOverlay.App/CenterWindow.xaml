@@ -1,0 +1,286 @@
+<Window x:Class="NexOverlay.App.CenterWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Width="840"
+        Height="300"
+        WindowStyle="None"
+        ResizeMode="NoResize"
+        AllowsTransparency="True"
+        Background="Transparent"
+        ShowInTaskbar="False"
+        Topmost="True"
+        Opacity="0">
+
+    <Window.Resources>
+
+        <Style x:Key="ModuleCardStyle"
+               TargetType="Border">
+            <Setter Property="CornerRadius" Value="18"/>
+            <Setter Property="Background" Value="#DC10141B"/>
+            <Setter Property="BorderBrush" Value="#2CFFFFFF"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
+            <Setter Property="RenderTransform">
+                <Setter.Value>
+                    <TransformGroup>
+                        <ScaleTransform ScaleX="1" ScaleY="1"/>
+                        <TranslateTransform Y="0"/>
+                    </TransformGroup>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+    </Window.Resources>
+
+    <Grid
+        x:Name="Root"
+        Margin="30"
+        RenderTransformOrigin="0.5,0.5">
+
+        <Grid.RenderTransform>
+            <TransformGroup>
+                <ScaleTransform x:Name="RootScale"
+                                ScaleX="0.96"
+                                ScaleY="0.96"/>
+                <TranslateTransform x:Name="RootTranslate"
+                                    Y="10"/>
+            </TransformGroup>
+        </Grid.RenderTransform>
+
+        <Grid x:Name="HomePanel">
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="116"/>
+                <RowDefinition Height="14"/>
+                <RowDefinition Height="76"/>
+            </Grid.RowDefinitions>
+
+            <Border
+                CornerRadius="28"
+                Background="#F011151C"
+                BorderBrush="#42FFFFFF"
+                BorderThickness="1">
+
+                <Border.Effect>
+                    <DropShadowEffect
+                        BlurRadius="40"
+                        ShadowDepth="10"
+                        Direction="270"
+                        Opacity="0.52"
+                        Color="#C9000000"/>
+                </Border.Effect>
+
+                <Grid>
+
+                    <Border
+                        Height="1"
+                        Margin="32,1,32,0"
+                        VerticalAlignment="Top"
+                        Background="#50FFFFFF"/>
+
+                    <Grid Margin="22,0">
+
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="58"/>
+                            <ColumnDefinition Width="1"/>
+                            <ColumnDefinition Width="20"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="44"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Border
+                            Width="46"
+                            Height="46"
+                            CornerRadius="15"
+                            Background="#1B222C38"
+                            BorderBrush="#36FFFFFF"
+                            BorderThickness="1"
+                            VerticalAlignment="Center">
+
+                            <Path
+                                Width="14"
+                                Height="14"
+                                Stretch="Uniform"
+                                Stroke="#E7F2FF"
+                                StrokeThickness="1.5"
+                                Data="M 7,0 L 14,7 L 7,14 L 0,7 Z"/>
+                        </Border>
+
+                        <Border
+                            Grid.Column="1"
+                            Height="34"
+                            Background="#24FFFFFF"
+                            VerticalAlignment="Center"/>
+
+                        <TextBlock
+                            Grid.Column="3"
+                            Text="Search anything..."
+                            Foreground="#ADFFFFFF"
+                            FontSize="16"
+                            VerticalAlignment="Center"/>
+
+                        <Path
+                            Grid.Column="4"
+                            Width="19"
+                            Height="19"
+                            Stretch="Uniform"
+                            Stroke="#CCD9E8"
+                            StrokeThickness="1.7"
+                            Data="M 8,1 A 7,7 0 1 0 8,15 A 7,7 0 1 0 8,1 M 13,13 L 18,18"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"/>
+                    </Grid>
+                </Grid>
+            </Border>
+
+            <Grid Grid.Row="2">
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="12"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="12"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="12"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Border
+                    x:Name="NotesCard"
+                    Grid.Column="0"
+                    Tag="Notes"
+                    Style="{StaticResource ModuleCardStyle}"
+                    MouseEnter="ModuleCard_OnMouseEnter"
+                    MouseLeave="ModuleCard_OnMouseLeave"
+                    MouseLeftButtonDown="ModuleCard_OnMouseLeftButtonDown"
+                    MouseLeftButtonUp="ModuleCard_OnMouseLeftButtonUp">
+
+                    <StackPanel
+                        Orientation="Horizontal"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center">
+
+                        <Path
+                            Width="13"
+                            Height="13"
+                            Stretch="Uniform"
+                            Stroke="#B9D5FF"
+                            StrokeThickness="1.4"
+                            Data="M 1,1 L 11,1 L 11,13 L 1,13 Z M 4,4 L 9,4 M 4,7 L 9,7 M 4,10 L 8,10"/>
+
+                        <TextBlock
+                            Text="NOTES"
+                            Margin="9,0,0,0"
+                            Foreground="#D8FFFFFF"
+                            FontSize="10"
+                            FontWeight="SemiBold"/>
+                    </StackPanel>
+                </Border>
+
+                <Border
+                    x:Name="SnippetsCard"
+                    Grid.Column="2"
+                    Tag="Snippets"
+                    Style="{StaticResource ModuleCardStyle}"
+                    MouseEnter="ModuleCard_OnMouseEnter"
+                    MouseLeave="ModuleCard_OnMouseLeave"
+                    MouseLeftButtonDown="ModuleCard_OnMouseLeftButtonDown"
+                    MouseLeftButtonUp="ModuleCard_OnMouseLeftButtonUp">
+
+                    <StackPanel
+                        Orientation="Horizontal"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center">
+
+                        <Path
+                            Width="15"
+                            Height="13"
+                            Stretch="Uniform"
+                            Stroke="#CDBFFF"
+                            StrokeThickness="1.5"
+                            Data="M 5,2 L 1,6.5 L 5,11 M 10,2 L 14,6.5 L 10,11 M 8,1 L 6,12"/>
+
+                        <TextBlock
+                            Text="SNIPS"
+                            Margin="9,0,0,0"
+                            Foreground="#D8FFFFFF"
+                            FontSize="10"
+                            FontWeight="SemiBold"/>
+                    </StackPanel>
+                </Border>
+
+                <Border
+                    x:Name="FilesCard"
+                    Grid.Column="4"
+                    Tag="Files"
+                    Style="{StaticResource ModuleCardStyle}"
+                    MouseEnter="ModuleCard_OnMouseEnter"
+                    MouseLeave="ModuleCard_OnMouseLeave"
+                    MouseLeftButtonDown="ModuleCard_OnMouseLeftButtonDown"
+                    MouseLeftButtonUp="ModuleCard_OnMouseLeftButtonUp">
+
+                    <StackPanel
+                        Orientation="Horizontal"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center">
+
+                        <Path
+                            Width="15"
+                            Height="13"
+                            Stretch="Uniform"
+                            Stroke="#ACF1E8"
+                            StrokeThickness="1.4"
+                            Data="M 1,4 L 6,4 L 7.5,2 L 14,2 L 14,12 L 1,12 Z"/>
+
+                        <TextBlock
+                            Text="FILES"
+                            Margin="9,0,0,0"
+                            Foreground="#D8FFFFFF"
+                            FontSize="10"
+                            FontWeight="SemiBold"/>
+                    </StackPanel>
+                </Border>
+
+                <Border
+                    x:Name="ClipsCard"
+                    Grid.Column="6"
+                    Tag="Clips"
+                    Style="{StaticResource ModuleCardStyle}"
+                    MouseEnter="ModuleCard_OnMouseEnter"
+                    MouseLeave="ModuleCard_OnMouseLeave"
+                    MouseLeftButtonDown="ModuleCard_OnMouseLeftButtonDown"
+                    MouseLeftButtonUp="ModuleCard_OnMouseLeftButtonUp">
+
+                    <StackPanel
+                        Orientation="Horizontal"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center">
+
+                        <Path
+                            Width="14"
+                            Height="14"
+                            Stretch="Uniform"
+                            Stroke="#FFC7DE"
+                            StrokeThickness="1.4"
+                            Data="M 4,1 L 11,1 L 13,3 L 13,10 L 11,12 L 4,12 L 2,10 L 2,3 Z M 5,4 L 10,4 M 5,7 L 10,7 M 5,10 L 8,10"/>
+
+                        <TextBlock
+                            Text="CLIPS"
+                            Margin="9,0,0,0"
+                            Foreground="#D8FFFFFF"
+                            FontSize="10"
+                            FontWeight="SemiBold"/>
+                    </StackPanel>
+                </Border>
+
+            </Grid>
+        </Grid>
+
+        <Grid
+            x:Name="ModuleHost"
+            Visibility="Collapsed"
+            Opacity="0"/>
+
+    </Grid>
+</Window>

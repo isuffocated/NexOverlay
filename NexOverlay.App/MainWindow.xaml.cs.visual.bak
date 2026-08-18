@@ -1,0 +1,614 @@
+﻿using System;
+using System.Windows;
+using System.Windows.Media.Animation;
+using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Media;
+using NexOverlay.Windows;
+
+namespace NexOverlay.App;
+
+public partial class MainWindow : Window
+{
+    private enum OverlayState
+    {
+        Idle,
+        OpenArmed,
+        Open,
+        CloseArmed,
+        Opening,
+        Closing
+    }
+
+    private GlobalHotkeyService? _hotkeyService;
+    private HandleWindow? _handleWindow;
+    private SnippetsView? _snippetsView;
+
+    private OverlayState _state = OverlayState.Idle;
+
+    public MainWindow()
+    {
+        InitializeComponent();
+
+        Loaded += OnLoaded;
+        Closed += OnClosed;
+    }
+
+    private void OnLoaded(object sender, RoutedEventArgs e)
+    {
+        _hotkeyService = new GlobalHotkeyService();
+        _hotkeyService.Triggered += OnHotkeyTriggered;
+        _hotkeyService.Register();
+
+        Hide();
+    }
+
+    private void OnHotkeyTriggered(object? sender, EventArgs e)
+    {
+        switch (_state)
+        {
+            case OverlayState.Idle:
+                ArmOpen();
+                break;
+
+            case OverlayState.OpenArmed:
+                CancelOpen();
+                break;
+
+            case OverlayState.Open:
+                ArmClose();
+                break;
+
+            case OverlayState.CloseArmed:
+                CancelClose();
+                break;
+        }
+    }
+
+    private void ArmOpen()
+    {
+        var handle = EnsureHandleWindow();
+
+        _state = OverlayState.OpenArmed;
+
+        handle.SetMode(HandleMode.Open);
+
+        if (!handle.IsVisible)
+            handle.Show();
+    }
+
+    private void CancelOpen()
+    {
+        _state = OverlayState.Idle;
+        _handleWindow?.Hide();
+    }
+
+    private void ArmClose()
+    {
+        var handle = EnsureHandleWindow();
+
+        _state = OverlayState.CloseArmed;
+
+        handle.SetMode(HandleMode.Close);
+
+        if (!handle.IsVisible)
+            handle.Show();
+    }
+
+    private void CancelClose()
+    {
+        _state = OverlayState.Open;
+        _handleWindow?.Hide();
+    }
+
+    private HandleWindow EnsureHandleWindow()
+    {
+        if (_handleWindow is not null)
+            return _handleWindow;
+
+        _handleWindow = new HandleWindow();
+        _handleWindow.HoverTriggered += OnHandleHoverTriggered;
+
+        return _handleWindow;
+    }
+
+    private void OnHandleHoverTriggered(object? sender, EventArgs e)
+    {
+        switch (_state)
+        {
+            case OverlayState.OpenArmed:
+                BeginOpenAnimation();
+                break;
+
+            case OverlayState.CloseArmed:
+                BeginCloseAnimation();
+                break;
+        }
+    }
+
+    private void ApplyCurrentMonitorBounds()
+    {
+        var monitor = _monitorService.GetMonitorFromCursor();
+
+        WindowStartupLocation = WindowStartupLocation.Manual;
+
+        Left = monitor.X;
+        Top = monitor.Y;
+        Width = monitor.Width;
+        Height = monitor.Height;
+    }
+
+    private void BeginOpenAnimation()
+    {
+        _state = OverlayState.Opening;
+
+        _handleWindow?.Hide();
+        ApplyCurrentMonitorBounds();
+        ResetVisualState();
+
+        Show();
+        Activate();
+
+        var ease = new CubicEase
+        {
+            EasingMode = EasingMode.EaseOut
+        };
+
+        var fastEase = new QuarticEase
+        {
+            EasingMode = EasingMode.EaseOut
+        };
+
+        var windowFade = new DoubleAnimation
+        {
+            From = 0,
+            To = 1,
+            Duration = TimeSpan.FromMilliseconds(120)
+        };
+
+        BeginAnimation(OpacityProperty, windowFade);
+
+        var scaleX = new DoubleAnimation
+        {
+            From = 0.16,
+            To = 1,
+            Duration = TimeSpan.FromMilliseconds(360),
+            EasingFunction = fastEase
+        };
+
+        var scaleY = new DoubleAnimation
+        {
+            From = 0.16,
+            To = 1,
+            Duration = TimeSpan.FromMilliseconds(360),
+            EasingFunction = fastEase
+        };
+
+        CoreScale.BeginAnimation(
+            System.Windows.Media.ScaleTransform.ScaleXProperty,
+            scaleX);
+
+        CoreScale.BeginAnimation(
+            System.Windows.Media.ScaleTransform.ScaleYProperty,
+            scaleY);
+
+        var coreFade = new DoubleAnimation
+        {
+            From = 0,
+            To = 1,
+            Duration = TimeSpan.FromMilliseconds(180),
+            EasingFunction = ease
+        };
+
+        MainCore.BeginAnimation(OpacityProperty, coreFade);
+
+        var glowFade = new DoubleAnimation
+        {
+            From = 0,
+            To = 1,
+            BeginTime = TimeSpan.FromMilliseconds(110),
+            Duration = TimeSpan.FromMilliseconds(230)
+        };
+
+        AmbientGlow.BeginAnimation(OpacityProperty, glowFade);
+
+        var contentFade = new DoubleAnimation
+        {
+            From = 0,
+            To = 1,
+            BeginTime = TimeSpan.FromMilliseconds(140),
+            Duration = TimeSpan.FromMilliseconds(220),
+            EasingFunction = ease
+        };
+
+        contentFade.Completed += (_, _) =>
+        {
+            _state = OverlayState.Open;
+        };
+
+        MainContent.BeginAnimation(OpacityProperty, contentFade);
+    }
+
+    private void BeginCloseAnimation()
+    {
+        _state = OverlayState.Closing;
+
+        _handleWindow?.Hide();
+
+        var ease = new CubicEase
+        {
+            EasingMode = EasingMode.EaseIn
+        };
+
+        var contentFade = new DoubleAnimation
+        {
+            From = 1,
+            To = 0,
+            Duration = TimeSpan.FromMilliseconds(90)
+        };
+
+        MainContent.BeginAnimation(OpacityProperty, contentFade);
+        AmbientGlow.BeginAnimation(OpacityProperty, contentFade);
+
+        var scaleX = new DoubleAnimation
+        {
+            From = 1,
+            To = 0.16,
+            BeginTime = TimeSpan.FromMilliseconds(30),
+            Duration = TimeSpan.FromMilliseconds(220),
+            EasingFunction = ease
+        };
+
+        var scaleY = new DoubleAnimation
+        {
+            From = 1,
+            To = 0.16,
+            BeginTime = TimeSpan.FromMilliseconds(30),
+            Duration = TimeSpan.FromMilliseconds(220),
+            EasingFunction = ease
+        };
+
+        CoreScale.BeginAnimation(
+            System.Windows.Media.ScaleTransform.ScaleXProperty,
+            scaleX);
+
+        CoreScale.BeginAnimation(
+            System.Windows.Media.ScaleTransform.ScaleYProperty,
+            scaleY);
+
+        var coreFade = new DoubleAnimation
+        {
+            From = 1,
+            To = 0,
+            BeginTime = TimeSpan.FromMilliseconds(80),
+            Duration = TimeSpan.FromMilliseconds(150)
+        };
+
+        MainCore.BeginAnimation(OpacityProperty, coreFade);
+
+        var windowFade = new DoubleAnimation
+        {
+            From = 1,
+            To = 0,
+            BeginTime = TimeSpan.FromMilliseconds(100),
+            Duration = TimeSpan.FromMilliseconds(150)
+        };
+
+        windowFade.Completed += (_, _) =>
+        {
+            Hide();
+            ResetVisualState();
+            _state = OverlayState.Idle;
+        };
+
+        BeginAnimation(OpacityProperty, windowFade);
+    }
+
+    private void ResetVisualState()
+    {
+        BeginAnimation(OpacityProperty, null);
+        MainCore.BeginAnimation(OpacityProperty, null);
+        MainContent.BeginAnimation(OpacityProperty, null);
+        AmbientGlow.BeginAnimation(OpacityProperty, null);
+
+        CoreScale.BeginAnimation(
+            System.Windows.Media.ScaleTransform.ScaleXProperty,
+            null);
+
+        CoreScale.BeginAnimation(
+            System.Windows.Media.ScaleTransform.ScaleYProperty,
+            null);
+
+        Opacity = 0;
+        MainCore.Opacity = 0;
+        MainContent.Opacity = 0;
+        AmbientGlow.Opacity = 0;
+
+        CoreScale.ScaleX = 0.16;
+        CoreScale.ScaleY = 0.16;
+    }
+
+    private void ModuleCard_OnMouseEnter(
+    object sender,
+    MouseEventArgs e)
+    {
+        if (sender is not Border card)
+            return;
+
+        if (card.RenderTransform is not TransformGroup group)
+            return;
+
+        if (group.Children[0] is not ScaleTransform scale)
+            return;
+
+        if (group.Children[1] is not TranslateTransform translate)
+            return;
+
+        var ease = new CubicEase
+        {
+            EasingMode = EasingMode.EaseOut
+        };
+
+        var scaleX = new DoubleAnimation
+        {
+            To = 1.045,
+            Duration = TimeSpan.FromMilliseconds(150),
+            EasingFunction = ease
+        };
+
+        var scaleY = new DoubleAnimation
+        {
+            To = 1.045,
+            Duration = TimeSpan.FromMilliseconds(150),
+            EasingFunction = ease
+        };
+
+        var moveUp = new DoubleAnimation
+        {
+            To = -4,
+            Duration = TimeSpan.FromMilliseconds(150),
+            EasingFunction = ease
+        };
+
+        scale.BeginAnimation(
+            ScaleTransform.ScaleXProperty,
+            scaleX);
+
+        scale.BeginAnimation(
+            ScaleTransform.ScaleYProperty,
+            scaleY);
+
+        translate.BeginAnimation(
+            TranslateTransform.YProperty,
+            moveUp);
+
+        card.Background = new SolidColorBrush(
+            Color.FromArgb(150, 18, 23, 32));
+
+        card.BorderBrush = GetModuleAccent(
+            card.Tag?.ToString(),
+            105);
+
+        card.BorderBrush = GetModuleAccent(card.Tag?.ToString(), 90);
+    }
+
+    private void ModuleCard_OnMouseLeave(
+        object sender,
+        MouseEventArgs e)
+    {
+        if (sender is not Border card)
+            return;
+
+        if (card.RenderTransform is not TransformGroup group)
+            return;
+
+        if (group.Children[0] is not ScaleTransform scale)
+            return;
+
+        if (group.Children[1] is not TranslateTransform translate)
+            return;
+
+        var ease = new CubicEase
+        {
+            EasingMode = EasingMode.EaseOut
+        };
+
+        var scaleX = new DoubleAnimation
+        {
+            To = 1,
+            Duration = TimeSpan.FromMilliseconds(180),
+            EasingFunction = ease
+        };
+
+        var scaleY = new DoubleAnimation
+        {
+            To = 1,
+            Duration = TimeSpan.FromMilliseconds(180),
+            EasingFunction = ease
+        };
+
+        var moveDown = new DoubleAnimation
+        {
+            To = 0,
+            Duration = TimeSpan.FromMilliseconds(180),
+            EasingFunction = ease
+        };
+
+        scale.BeginAnimation(
+            ScaleTransform.ScaleXProperty,
+            scaleX);
+
+        scale.BeginAnimation(
+            ScaleTransform.ScaleYProperty,
+            scaleY);
+
+        translate.BeginAnimation(
+            TranslateTransform.YProperty,
+            moveDown);
+
+        card.Background = new SolidColorBrush(
+            Color.FromArgb(0x12, 255, 255, 255));
+
+        card.BorderBrush = new SolidColorBrush(
+            Color.FromArgb(0x18, 255, 255, 255));
+    }
+
+    private void ModuleCard_OnMouseLeftButtonUp(
+        object sender,
+        MouseButtonEventArgs e)
+    {
+        if (sender is not Border card)
+            return;
+
+        var module = card.Tag?.ToString();
+
+        PlayModuleClickAnimation(card);
+
+        if (module == "Snippets")
+        {
+            OpenSnippets();
+        }
+    }
+
+    private void OpenSnippets()
+    {
+        if (_snippetsView is null)
+        {
+            _snippetsView = new SnippetsView();
+            _snippetsView.BackRequested += (_, _) => CloseSnippets();
+        }
+
+        foreach (UIElement child in MainContent.Children)
+        {
+            if (!ReferenceEquals(child, _snippetsView))
+                child.Visibility = Visibility.Collapsed;
+        }
+
+        if (!MainContent.Children.Contains(_snippetsView))
+        {
+            MainContent.Children.Add(_snippetsView);
+
+            Grid.SetColumn(_snippetsView, 0);
+            Grid.SetColumnSpan(
+                _snippetsView,
+                Math.Max(1, MainContent.ColumnDefinitions.Count));
+
+            Grid.SetRow(_snippetsView, 0);
+            Grid.SetRowSpan(
+                _snippetsView,
+                Math.Max(1, MainContent.RowDefinitions.Count));
+        }
+
+        _snippetsView.Visibility = Visibility.Visible;
+        _snippetsView.Opacity = 0;
+
+        var fade = new DoubleAnimation
+        {
+            From = 0,
+            To = 1,
+            Duration = TimeSpan.FromMilliseconds(180),
+            EasingFunction = new CubicEase
+            {
+                EasingMode = EasingMode.EaseOut
+            }
+        };
+
+        _snippetsView.BeginAnimation(
+            OpacityProperty,
+            fade);
+    }
+
+    private void CloseSnippets()
+    {
+        if (_snippetsView is null)
+            return;
+
+        var fade = new DoubleAnimation
+        {
+            From = 1,
+            To = 0,
+            Duration = TimeSpan.FromMilliseconds(130),
+            EasingFunction = new CubicEase
+            {
+                EasingMode = EasingMode.EaseIn
+            }
+        };
+
+        fade.Completed += (_, _) =>
+        {
+            _snippetsView.Visibility = Visibility.Collapsed;
+
+            foreach (UIElement child in MainContent.Children)
+            {
+                if (!ReferenceEquals(child, _snippetsView))
+                    child.Visibility = Visibility.Visible;
+            }
+        };
+
+        _snippetsView.BeginAnimation(
+            OpacityProperty,
+            fade);
+    }
+
+private void PlayModuleClickAnimation(Border card)
+    {
+        if (card.RenderTransform is not TransformGroup group)
+            return;
+
+        if (group.Children[0] is not ScaleTransform scale)
+            return;
+
+        var downEase = new QuadraticEase
+        {
+            EasingMode = EasingMode.EaseOut
+        };
+
+        var down = new DoubleAnimation
+        {
+            To = 0.965,
+            Duration = TimeSpan.FromMilliseconds(70),
+            AutoReverse = true,
+            EasingFunction = downEase
+        };
+
+        scale.BeginAnimation(
+            ScaleTransform.ScaleXProperty,
+            down);
+
+        scale.BeginAnimation(
+            ScaleTransform.ScaleYProperty,
+            down);
+    }
+
+    private static Brush GetModuleAccent(
+        string? module,
+        byte alpha)
+    {
+        var color = module switch
+        {
+            "Notes" =>
+                Color.FromArgb(alpha, 169, 207, 255),
+
+            "Snippets" =>
+                Color.FromArgb(alpha, 189, 179, 255),
+
+            "Files" =>
+                Color.FromArgb(alpha, 166, 240, 229),
+
+            "Clips" =>
+                Color.FromArgb(alpha, 255, 184, 216),
+
+            _ =>
+                Color.FromArgb(alpha, 255, 255, 255)
+        };
+
+        return new SolidColorBrush(color);
+    }
+
+    private void OnClosed(object? sender, EventArgs e)
+    {
+        _hotkeyService?.Dispose();
+    }
+
+    private readonly MonitorService _monitorService = new();
+}

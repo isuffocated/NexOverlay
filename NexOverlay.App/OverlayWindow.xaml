@@ -1,0 +1,1065 @@
+<Window x:Class="NexOverlay.App.OverlayWindow"
+        FontFamily="/NexOverlay.App;component/Assets/Fonts/#Copperplate"
+        FontWeight="Normal"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:svgc="http://sharpvectors.codeplex.com/svgc/"
+        WindowStyle="None"
+        ResizeMode="NoResize"
+        AllowsTransparency="True"
+        Background="#FF06080C"
+        ShowInTaskbar="False"
+        Topmost="True"
+        Opacity="0"
+        TextOptions.TextFormattingMode="Display"
+        TextOptions.TextRenderingMode="Grayscale"
+        UseLayoutRounding="True"
+        SnapsToDevicePixels="True">
+
+    <Window.Resources>
+                <Style x:Key="GlobalSearchSuggestionStyle"
+               TargetType="Button">
+            <Setter Property="Background"
+                    Value="Transparent"/>
+            <Setter Property="BorderThickness"
+                    Value="0"/>
+            <Setter Property="Padding"
+                    Value="13,9"/>
+            <Setter Property="HorizontalContentAlignment"
+                    Value="Stretch"/>
+            <Setter Property="Cursor"
+                    Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Root"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="13">
+                            <ContentPresenter/>
+                        </Border>
+
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver"
+                                     Value="True">
+                                <Setter TargetName="Root"
+                                        Property="Background"
+                                        Value="#16FFFFFF"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+<Style x:Key="CleanModuleHitboxStyle"
+               TargetType="Button">
+            <Setter Property="Background" Value="#01000000"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Margin" Value="0"/>
+            <Setter Property="Focusable" Value="False"/>
+            <Setter Property="IsTabStop" Value="False"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="#01000000"
+                                BorderThickness="0"/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="StableHitButtonStyle"
+               TargetType="Button">
+            <Setter Property="Background" Value="#01000000"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Focusable" Value="False"/>
+            <Setter Property="IsTabStop" Value="False"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="FloatingPanelStyle"
+               TargetType="Border">
+            <Setter Property="Background"
+                    Value="#EA11151C"/>
+            <Setter Property="BorderBrush"
+                    Value="#3AFFFFFF"/>
+            <Setter Property="BorderThickness"
+                    Value="1"/>
+            <Setter Property="CornerRadius"
+                    Value="26"/>
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect
+                        BlurRadius="38"
+                        ShadowDepth="8"
+                        Direction="270"
+                        Opacity="0.48"
+                        Color="#D0000000"/>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="ModuleHitButtonStyle"
+               TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Focusable" Value="False"/>
+            <Setter Property="IsTabStop" Value="False"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="#FF06080C"/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="ModuleCardStyle"
+               TargetType="Border">
+            <Setter Property="Background"
+                    Value="#DC10141B"/>
+            <Setter Property="BorderBrush"
+                    Value="#2CFFFFFF"/>
+            <Setter Property="BorderThickness"
+                    Value="1"/>
+            <Setter Property="CornerRadius"
+                    Value="18"/>
+            <Setter Property="Cursor"
+                    Value="Hand"/>
+            <Setter Property="RenderTransformOrigin"
+                    Value="0.5,0.5"/>
+            <Setter Property="RenderTransform">
+                <Setter.Value>
+                    <TransformGroup>
+                        <ScaleTransform ScaleX="1"
+                                        ScaleY="1"/>
+                        <TranslateTransform Y="0"/>
+                    </TransformGroup>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+    </Window.Resources>
+
+    <Grid x:Name="OverlayRoot"
+          ClipToBounds="True">
+
+        <!-- blurred desktop snapshot -->
+        <Border Margin="-18">
+
+            <Image
+                x:Name="DesktopImage"
+                Stretch="Fill"
+                RenderOptions.BitmapScalingMode="HighQuality">
+
+                <Image.Effect>
+                    <BlurEffect
+                        Radius="15"
+                        KernelType="Gaussian"
+                        RenderingBias="Performance"/>
+                </Image.Effect>
+            </Image>
+        </Border>
+
+        <!-- dark veil -->
+        <Border Background="#7A06080C"/>
+
+        <!-- vignette / depth -->
+        <Border>
+            <Border.Background>
+                <RadialGradientBrush
+                    Center="0.5,0.46"
+                    GradientOrigin="0.5,0.46"
+                    RadiusX="0.95"
+                    RadiusY="0.95">
+                    <GradientStop Color="#071B3152"
+                                  Offset="0"/>
+                    <GradientStop Color="#10090C11"
+                                  Offset="0.52"/>
+                    <GradientStop Color="#45040609"
+                                  Offset="1"/>
+                </RadialGradientBrush>
+            </Border.Background>
+        </Border>
+
+        <!-- all visible UI lives in ONE window -->
+        <Grid
+            x:Name="CompositionRoot"
+            Width="1730"
+            Height="720"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            RenderTransformOrigin="0.5,0.5">
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="380"/>
+                <ColumnDefinition Width="55"/>
+                <ColumnDefinition Width="860"/>
+                <ColumnDefinition Width="55"/>
+                <ColumnDefinition Width="380"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- RECENT -->
+            <Grid
+                x:Name="RecentPanel"
+                Grid.Column="0"
+                Width="340"
+                Height="390"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                MouseEnter="RecentPanel_OnMouseEnter"
+                MouseLeave="LayoutZone_OnMouseLeave"
+                Opacity="0"
+                RenderTransformOrigin="0.5,0.5">
+
+                <Grid.RenderTransform>
+                    <TransformGroup>
+                        <ScaleTransform x:Name="RecentScale"
+                                        ScaleX="0.96"
+                                        ScaleY="0.96"/>
+                        <TranslateTransform x:Name="RecentTranslate"
+                                            X="-18"/>
+                    </TransformGroup>
+                </Grid.RenderTransform>
+
+                <Border
+                    Margin="20"
+                    Style="{StaticResource FloatingPanelStyle}">
+
+                    <Grid Margin="22">
+
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="20"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <StackPanel>
+                            <TextBlock
+                                Text="RECENT"
+                                Foreground="#E4FFFFFF"
+                                FontSize="13"
+                                FontWeight="SemiBold"/>
+
+                            <TextBlock
+                                Text="Last activity"
+                                Margin="0,5,0,0"
+                                Foreground="#66FFFFFF"
+                                FontSize="13"/>
+                        </StackPanel>
+
+                        <ScrollViewer
+                            Grid.Row="2"
+                            VerticalScrollBarVisibility="Hidden"
+                            HorizontalScrollBarVisibility="Disabled"
+                            PanningMode="VerticalOnly">
+
+                            <StackPanel>
+
+                            <Border
+                                Height="62"
+                                CornerRadius="14"
+                                Background="#12FFFFFF"
+                                Margin="0,0,0,9">
+
+                                <Grid Margin="14,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="3"/>
+                                        <ColumnDefinition Width="12"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <Border
+                                        Width="2"
+                                        Height="28"
+                                        CornerRadius="1"
+                                        Background="#91A9CFFF"
+                                        VerticalAlignment="Center"/>
+
+                                    <StackPanel
+                                        Grid.Column="2"
+                                        VerticalAlignment="Center">
+
+                                        <TextBlock
+                                            x:Name="RecentTitle1" Text="EMPTY"
+                                            Foreground="#E8FFFFFF"
+                                            FontSize="13"/>
+
+                                        <TextBlock
+                                            x:Name="RecentMeta1" Text=""
+                                            Margin="0,4,0,0"
+                                            Foreground="#58FFFFFF"
+                                            FontSize="13"/>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+
+                            <Border
+                                Height="62"
+                                CornerRadius="14"
+                                Background="#12FFFFFF"
+                                Margin="0,0,0,9">
+
+                                <Grid Margin="14,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="3"/>
+                                        <ColumnDefinition Width="12"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <Border
+                                        Width="2"
+                                        Height="28"
+                                        CornerRadius="1"
+                                        Background="#84A7F0E7"
+                                        VerticalAlignment="Center"/>
+
+                                    <StackPanel
+                                        Grid.Column="2"
+                                        VerticalAlignment="Center">
+
+                                        <TextBlock
+                                            x:Name="RecentTitle2" Text=""
+                                            Foreground="#E8FFFFFF"
+                                            FontSize="13"/>
+
+                                        <TextBlock
+                                            x:Name="RecentMeta2" Text=""
+                                            Margin="0,4,0,0"
+                                            Foreground="#58FFFFFF"
+                                            FontSize="13"/>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+
+                            <Border
+                                Height="62"
+                                CornerRadius="14"
+                                Background="#12FFFFFF">
+
+                                <Grid Margin="14,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="3"/>
+                                        <ColumnDefinition Width="12"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <Border
+                                        Width="2"
+                                        Height="28"
+                                        CornerRadius="1"
+                                        Background="#80FFC3DB"
+                                        VerticalAlignment="Center"/>
+
+                                    <StackPanel
+                                        Grid.Column="2"
+                                        VerticalAlignment="Center">
+
+                                        <TextBlock
+                                            x:Name="RecentTitle3" Text=""
+                                            Foreground="#E8FFFFFF"
+                                            FontSize="13"/>
+
+                                        <TextBlock
+                                            x:Name="RecentMeta3" Text=""
+                                            Margin="0,4,0,0"
+                                            Foreground="#58FFFFFF"
+                                            FontSize="13"/>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+
+                            </StackPanel>
+                        </ScrollViewer>
+                    </Grid>
+                </Border>
+            </Grid>
+
+            <!-- CENTER -->
+            <Grid
+                x:Name="CenterPanel"
+                Grid.Column="2"
+                Width="860"
+                Height="650"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                MouseEnter="CenterPanel_OnMouseEnter"
+                MouseLeave="LayoutZone_OnMouseLeave"
+                Opacity="0"
+                RenderTransformOrigin="0.5,0.5">
+
+                <Grid.RenderTransform>
+                    <TransformGroup>
+                        <ScaleTransform x:Name="CenterScale"
+                                        ScaleX="0.96"
+                                        ScaleY="0.96"/>
+                        <TranslateTransform x:Name="CenterTranslate"
+                                            Y="12"/>
+                    </TransformGroup>
+                </Grid.RenderTransform>
+
+                <!-- HOME -->
+                <Grid
+                    x:Name="HomePanel"
+                    Width="860"
+                    Height="300"
+                    VerticalAlignment="Center">
+
+                    <Grid Margin="30">
+
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="116"/>
+                            <RowDefinition Height="14"/>
+                            <RowDefinition Height="76"/>
+                        </Grid.RowDefinitions>
+                        <Border
+                            x:Name="SearchSuggestionsPanel"
+                        Padding="14,12,14,12"
+                            Grid.Row="0"
+                            Grid.RowSpan="3"
+                            Panel.ZIndex="90"
+                            Width="820"
+                            MaxHeight="270"
+                            Margin="0,0,0,12"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Bottom"
+                            CornerRadius="18"
+                            Background="#F20A0F16"
+                            BorderBrush="#5898BFE9"
+                            BorderThickness="1"
+                            Visibility="Collapsed">
+
+                            
+                            <Border.RenderTransform>
+                                <TranslateTransform Y="-218"/>
+                            </Border.RenderTransform>
+<Border.Effect>
+                                <DropShadowEffect
+                                    BlurRadius="44"
+                                    ShadowDepth="8"
+                                    Direction="270"
+                                    Opacity="0.74"
+                                    Color="#D8000000"/>
+                            </Border.Effect>
+
+                            <ScrollViewer
+                                VerticalScrollBarVisibility="Hidden"
+                                HorizontalScrollBarVisibility="Disabled">
+
+                                <ItemsControl
+                                    x:Name="SearchSuggestionsList">
+
+                                                                                                                                                <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Button
+                                                Tag="{Binding}"
+                                                Style="{StaticResource GlobalSearchSuggestionStyle}"
+                                                Click="SearchSuggestion_OnClick"
+                                                Margin="5,3"
+                                                Padding="18,15">
+
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <TextBlock
+                                                        Text="{Binding Title}"
+                                                        Foreground="#F4FFFFFF"
+                                                        FontSize="17"
+                                                        FontWeight="SemiBold"
+                                                        VerticalAlignment="Center"
+                                                        TextTrimming="CharacterEllipsis"/>
+
+                                                    <Border
+                                                        Grid.Column="1"
+                                                        Margin="18,0,0,0"
+                                                        Padding="11,6"
+                                                        CornerRadius="10"
+                                                        VerticalAlignment="Center">
+
+                                                        <Border.Style>
+                                                            <Style TargetType="Border">
+                                                                <Setter Property="Background" Value="#14FFFFFF"/>
+                                                                <Setter Property="BorderBrush" Value="#30FFFFFF"/>
+                                                                <Setter Property="BorderThickness" Value="1"/>
+
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding Meta}" Value="ACTION">
+                                                                        <Setter Property="Background" Value="#2AFFB8D8"/>
+                                                                        <Setter Property="BorderBrush" Value="#90FFB8D8"/>
+                                                                    </DataTrigger>
+
+                                                                    <DataTrigger Binding="{Binding Meta}" Value="OPEN / MODULE">
+                                                                        <Setter Property="Background" Value="#26A9D8FF"/>
+                                                                        <Setter Property="BorderBrush" Value="#88A9D8FF"/>
+                                                                    </DataTrigger>
+
+                                                                    <DataTrigger Binding="{Binding Meta}" Value="OPEN / DID YOU MEAN?">
+                                                                        <Setter Property="Background" Value="#26A9D8FF"/>
+                                                                        <Setter Property="BorderBrush" Value="#88A9D8FF"/>
+                                                                    </DataTrigger>
+
+                                                                    <DataTrigger Binding="{Binding Meta}" Value="RESULT / NOTE">
+                                                                        <Setter Property="Background" Value="#269ED0FF"/>
+                                                                        <Setter Property="BorderBrush" Value="#829ED0FF"/>
+                                                                    </DataTrigger>
+
+                                                                    <DataTrigger Binding="{Binding Meta}" Value="RESULT / SNIPPET">
+                                                                        <Setter Property="Background" Value="#2CBDB3FF"/>
+                                                                        <Setter Property="BorderBrush" Value="#92BDB3FF"/>
+                                                                    </DataTrigger>
+
+                                                                    <DataTrigger Binding="{Binding Meta}" Value="RESULT / FILE">
+                                                                        <Setter Property="Background" Value="#26A6F0E5"/>
+                                                                        <Setter Property="BorderBrush" Value="#86A6F0E5"/>
+                                                                    </DataTrigger>
+
+                                                                    <DataTrigger Binding="{Binding Meta}" Value="RESULT / CLIP">
+                                                                        <Setter Property="Background" Value="#2AFFB8D8"/>
+                                                                        <Setter Property="BorderBrush" Value="#90FFB8D8"/>
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </Border.Style>
+
+                                                        <TextBlock
+                                                            Text="{Binding Meta}"
+                                                            Foreground="#F2FFFFFF"
+                                                            FontSize="13"
+                                                            FontWeight="SemiBold"
+                                                            VerticalAlignment="Center"/>
+                                                    </Border>
+                                                </Grid>
+                                            </Button>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </ScrollViewer>
+                        </Border>
+
+                        <Border
+                            CornerRadius="28"
+                            Background="#F011151C"
+                            BorderBrush="#42FFFFFF"
+                            BorderThickness="1">
+
+                            <Border.Effect>
+                                <DropShadowEffect
+                                    BlurRadius="40"
+                                    ShadowDepth="10"
+                                    Direction="270"
+                                    Opacity="0.52"
+                                    Color="#C9000000"/>
+                            </Border.Effect>
+
+                            <Grid>
+
+                                <Border
+                                    Height="1"
+                                    Margin="32,1,32,0"
+                                    VerticalAlignment="Top"
+                                    Background="#50FFFFFF"/>
+
+                                <Grid Margin="22,0"><Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="58"/>
+                                        <ColumnDefinition Width="1"/>
+                                        <ColumnDefinition Width="20"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="44"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Border
+                                        Grid.Column="1"
+                                        Width="32"
+                                        Height="32"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        CornerRadius="9"
+                                        Background="#11161C24"
+                                        BorderBrush="#2CFFFFFF"
+                                        BorderThickness="1"
+                                        Panel.ZIndex="30"
+                                        IsHitTestVisible="False">
+
+                                        <svgc:SvgViewbox
+                                            Width="15"
+                                            Height="15"
+                                            Source="/Assets/Icons/command.svg"/>
+                                    </Border>
+                                    <Border
+                                        x:Name="SearchGlowLayer"
+                                        Grid.ColumnSpan="5"
+                                        Margin="-22,0"
+                                        CornerRadius="28"
+                                        BorderThickness="1"
+                                        BorderBrush="#B9A9D8FF"
+                                        IsHitTestVisible="False"
+                                        Opacity="0">
+
+                                        <Border.Effect>
+                                            <DropShadowEffect
+                                                Color="#A9D8FF"
+                                                BlurRadius="36"
+                                                ShadowDepth="0"
+                                                Opacity="1"
+                                                RenderingBias="Performance"/>
+                                        </Border.Effect>
+                                    </Border>
+
+                                    <Border
+                                        Width="46"
+                                        Height="46"
+                                        CornerRadius="15"
+                                        Background="#1B222C38"
+                                        BorderBrush="#36FFFFFF"
+                                        BorderThickness="1"
+                                        VerticalAlignment="Center">
+
+                                        <Path
+                                            Width="14"
+                                            Height="14"
+                                            Stretch="Uniform"
+                                            Stroke="#E7F2FF"
+                                            StrokeThickness="1.5"
+                                            Data="M 7,0 L 14,7 L 7,14 L 0,7 Z"/>
+                                    </Border>
+
+                                    <Border
+                                        Grid.Column="1"
+                                        Height="34"
+                                        Background="#24FFFFFF"
+                                        VerticalAlignment="Center"/>
+
+                                    <TextBox
+                                        x:Name="GlobalSearchBox"
+                        SnapsToDevicePixels="True"
+                        SelectionBrush="#7098BFE9"
+                        TextAlignment="Left"
+                        HorizontalContentAlignment="Stretch"
+                        Padding="14,0,10,0"
+                                        Grid.Column="3"
+                                        Background="Transparent"
+                                        BorderThickness="0"
+                                        Foreground="#E8FFFFFF"
+                                        CaretBrush="#F4FAFF"
+                                        FontSize="16"
+                                        VerticalContentAlignment="Center"
+                                        TextChanged="GlobalSearchBox_OnTextChanged"
+                                        PreviewKeyDown="GlobalSearchBox_OnPreviewKeyDown"
+                                        MouseEnter="GlobalSearchBox_OnMouseEnter"
+                                        MouseLeave="GlobalSearchBox_OnMouseLeave"
+                                        GotKeyboardFocus="GlobalSearchBox_OnGotKeyboardFocus"
+                                        LostKeyboardFocus="GlobalSearchBox_OnLostKeyboardFocus"/>
+
+                                    <TextBlock
+                                        x:Name="GlobalSearchPlaceholder"
+                                        Grid.Column="3"
+                                        Text="Search workspace or run a command..."
+                                        Foreground="#ADFFFFFF"
+                                        FontSize="18"
+                                        VerticalAlignment="Center"
+                                        IsHitTestVisible="False"/>
+
+                                    <svgc:SvgViewbox
+                                        Grid.Column="4"
+                                        Width="19"
+                                        Height="19"
+                                        Source="/Assets/Icons/search.svg"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"/>
+                                </Grid>
+                            </Grid>
+                        </Border>
+
+                        <Grid Grid.Row="2">
+
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="12"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="12"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="12"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Border
+                                x:Name="NotesCard"
+                                Grid.Column="0"
+                                Tag="Notes"
+                                Style="{StaticResource ModuleCardStyle}"
+                                MouseEnter="ModuleCard_OnMouseEnter"
+                                MouseLeave="ModuleCard_OnMouseLeave"
+                                MouseLeftButtonDown="ModuleCard_OnMouseLeftButtonDown"
+                                MouseLeftButtonUp="ModuleCard_OnMouseLeftButtonUp">
+
+                                <StackPanel
+                                    Orientation="Horizontal"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center">
+
+                                    <svgc:SvgViewbox
+                                        Width="15"
+                                        Height="15"
+                                        Source="/Assets/Icons/notebook-pen.svg"/>
+
+                                    <TextBlock
+                                        Text="NOTES"
+                                        Margin="9,0,0,0"
+                                        Foreground="#D8FFFFFF"
+                                        FontSize="13"
+                                        FontWeight="SemiBold"/>
+                                </StackPanel>
+                            </Border>
+
+                            <Border
+                                x:Name="SnippetsCard"
+                                Grid.Column="2"
+                                Tag="Snippets"
+                                Style="{StaticResource ModuleCardStyle}"
+                                MouseEnter="ModuleCard_OnMouseEnter"
+                                MouseLeave="ModuleCard_OnMouseLeave"
+                                MouseLeftButtonDown="ModuleCard_OnMouseLeftButtonDown"
+                                MouseLeftButtonUp="ModuleCard_OnMouseLeftButtonUp">
+
+                                <StackPanel
+                                    Orientation="Horizontal"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center">
+
+                                    <svgc:SvgViewbox
+                                        Width="16"
+                                        Height="16"
+                                        Source="/Assets/Icons/code.svg"/>
+
+                                    <TextBlock
+                                        Text="SNIPS"
+                                        Margin="9,0,0,0"
+                                        Foreground="#D8FFFFFF"
+                                        FontSize="13"
+                                        FontWeight="SemiBold"/>
+                                </StackPanel>
+                            </Border>
+
+                            <Border
+                                x:Name="FilesCard"
+                                Grid.Column="4"
+                                Tag="Files"
+                                Style="{StaticResource ModuleCardStyle}"
+                                MouseEnter="ModuleCard_OnMouseEnter"
+                                MouseLeave="ModuleCard_OnMouseLeave"
+                                MouseLeftButtonDown="ModuleCard_OnMouseLeftButtonDown"
+                                MouseLeftButtonUp="ModuleCard_OnMouseLeftButtonUp">
+
+                                <StackPanel
+                                    Orientation="Horizontal"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center">
+
+                                    <svgc:SvgViewbox
+                                        Width="16"
+                                        Height="16"
+                                        Source="/Assets/Icons/folder.svg"/>
+
+                                    <TextBlock
+                                        Text="FILES"
+                                        Margin="9,0,0,0"
+                                        Foreground="#D8FFFFFF"
+                                        FontSize="13"
+                                        FontWeight="SemiBold"/>
+                                </StackPanel>
+                            </Border>
+
+                            <Border
+                                x:Name="ClipsCard"
+                                Grid.Column="6"
+                                Tag="Clips"
+                                Style="{StaticResource ModuleCardStyle}"
+                                MouseEnter="ModuleCard_OnMouseEnter"
+                                MouseLeave="ModuleCard_OnMouseLeave"
+                                MouseLeftButtonDown="ModuleCard_OnMouseLeftButtonDown"
+                                MouseLeftButtonUp="ModuleCard_OnMouseLeftButtonUp">
+
+                                <StackPanel
+                                    Orientation="Horizontal"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center">
+
+                                    <svgc:SvgViewbox
+                                        Width="16"
+                                        Height="16"
+                                        Source="/Assets/Icons/clipboard.svg"/>
+
+                                    <TextBlock
+                                        Text="CLIPS"
+                                        Margin="9,0,0,0"
+                                        Foreground="#D8FFFFFF"
+                                        FontSize="13"
+                                        FontWeight="SemiBold"/>
+                                </StackPanel>
+                            </Border>
+
+                        <!-- Real hit targets. Visual cards stay exactly as they are. -->
+                        <Button
+                            Grid.Column="0"
+                            Tag="Notes"
+                            Panel.ZIndex="20"
+                            Click="ModuleButton_OnClick"
+                            MouseEnter="ModuleHitButton_OnMouseEnter"
+                            MouseLeave="ModuleHitButton_OnMouseLeave" Style="{StaticResource CleanModuleHitboxStyle}"/>
+
+                        <Button
+                            Grid.Column="2"
+                            Tag="Snippets"
+                            Panel.ZIndex="20"
+                            Click="ModuleButton_OnClick"
+                            MouseEnter="ModuleHitButton_OnMouseEnter"
+                            MouseLeave="ModuleHitButton_OnMouseLeave" Style="{StaticResource CleanModuleHitboxStyle}"/>
+
+                        <Button
+                            Grid.Column="4"
+                            Tag="Files"
+                            Panel.ZIndex="20"
+                            Click="ModuleButton_OnClick"
+                            MouseEnter="ModuleHitButton_OnMouseEnter"
+                            MouseLeave="ModuleHitButton_OnMouseLeave" Style="{StaticResource CleanModuleHitboxStyle}"/>
+
+                        <Button
+                            Grid.Column="6"
+                            Tag="Clips"
+                            Panel.ZIndex="20"
+                            Click="ModuleButton_OnClick"
+                            MouseEnter="ModuleHitButton_OnMouseEnter"
+                            MouseLeave="ModuleHitButton_OnMouseLeave" Style="{StaticResource CleanModuleHitboxStyle}"/>
+
+                        </Grid>
+                    </Grid>
+                
+                                        <Button
+                        x:Name="BackgroundThemeButton"
+                        Padding="16,0"
+                        FontWeight="SemiBold"
+                        FontSize="13"
+                        Tag="BACKGROUND"
+                        Width="172"
+                        Height="44"
+                        Margin="-128,0,0,-62"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Bottom"
+                        Visibility="Visible"
+                        Cursor="Hand"
+                        Background="#12182028"
+                        BorderBrush="#38A9D8FF"
+                        BorderThickness="1"
+                        Click="BackgroundThemeButton_OnClick">
+
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <Border
+                                    x:Name="BackgroundThemeRoot"
+                                    CornerRadius="11"
+                                    Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}">
+
+                                    <TextBlock
+                                        x:Name="BackgroundThemeButtonText"
+                                        Text="{TemplateBinding Tag}"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        Foreground="#B8DCE8F5"
+                                        FontSize="10"
+                                        FontWeight="SemiBold"/>
+                                </Border>
+
+                                <ControlTemplate.Triggers>
+                                    <Trigger
+                                        Property="IsMouseOver"
+                                        Value="True">
+
+                                        <Setter
+                                            TargetName="BackgroundThemeRoot"
+                                            Property="Background"
+                                            Value="#20A9D8FF"/>
+
+                                        <Setter
+                                            TargetName="BackgroundThemeRoot"
+                                            Property="BorderBrush"
+                                            Value="#78A9D8FF"/>
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Button.Template>
+                    </Button>
+<Button
+                        x:Name="DebugTutorialButton"
+                        Padding="16,0"
+                        FontWeight="SemiBold"
+                        FontSize="13"
+                        Width="172"
+                        Height="44"
+                        Margin="128,0,0,-62"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Bottom"
+                        Visibility="Collapsed"
+                        Cursor="Hand"
+                        Background="#12182028"
+                        BorderBrush="#38A9D8FF"
+                        BorderThickness="1"
+                        Click="DebugTutorialButton_OnClick">
+
+                        <TextBlock
+                            Text="TUTORIAL"
+                            Foreground="#A8DCE8F5"
+                            FontSize="10"
+                            FontWeight="SemiBold"/>
+                    </Button></Grid>
+
+                <!-- MODULE HOST -->
+                <Grid
+                    x:Name="ModuleHost"
+                    Width="860"
+                    Height="650"
+                    Visibility="Collapsed"
+                    Opacity="0"/>
+
+            </Grid>
+
+            <!-- WORKSPACE -->
+            <Grid
+                x:Name="WorkspacePanel"
+                Grid.Column="4"
+                Width="340"
+                Height="390"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                MouseEnter="WorkspacePanel_OnMouseEnter"
+                MouseLeave="LayoutZone_OnMouseLeave"
+                Opacity="0"
+                RenderTransformOrigin="0.5,0.5">
+
+                <Grid.RenderTransform>
+                    <TransformGroup>
+                        <ScaleTransform x:Name="WorkspaceScale"
+                                        ScaleX="0.96"
+                                        ScaleY="0.96"/>
+                        <TranslateTransform x:Name="WorkspaceTranslate"
+                                            X="18"/>
+                    </TransformGroup>
+                </Grid.RenderTransform>
+
+                <Border
+                    Margin="20"
+                    Style="{StaticResource FloatingPanelStyle}">
+
+                    <Grid Margin="22">
+
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="20"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <StackPanel>
+                            <TextBlock
+                                Text="WORKSPACE"
+                                Foreground="#E4FFFFFF"
+                                FontSize="13"
+                                FontWeight="SemiBold"/>
+
+                            <TextBlock
+                                Text="@default"
+                                Margin="0,5,0,0"
+                                Foreground="#66FFFFFF"
+                                FontSize="13"/>
+                        </StackPanel>
+
+                        <UniformGrid
+                            Grid.Row="2"
+                            Rows="3"
+                            Columns="1">
+
+                            <Border
+                                Margin="0,0,0,9"
+                                CornerRadius="14"
+                                Background="#12FFFFFF">
+
+                                <Grid Margin="16,0">
+                                    <TextBlock
+                                        Text="NOTES"
+                                        Foreground="#6FFFFFFF"
+                                        FontSize="13"
+                                        VerticalAlignment="Center"/>
+
+                                    <TextBlock
+                                        x:Name="NoteCountText"
+                                        Text="0"
+                                        Foreground="#F0FFFFFF"
+                                        FontSize="24"
+                                        HorizontalAlignment="Right"
+                                        VerticalAlignment="Center"/>
+                                </Grid>
+                            </Border>
+
+                            <Border
+                                Margin="0,0,0,9"
+                                CornerRadius="14"
+                                Background="#12FFFFFF">
+
+                                <Grid Margin="16,0">
+                                    <TextBlock
+                                        Text="SNIPPETS"
+                                        Foreground="#6FFFFFFF"
+                                        FontSize="13"
+                                        VerticalAlignment="Center"/>
+
+                                    <TextBlock
+                                        x:Name="SnippetCountText" Text="0"
+                                        Foreground="#F0FFFFFF"
+                                        FontSize="24"
+                                        HorizontalAlignment="Right"
+                                        VerticalAlignment="Center"/>
+                                </Grid>
+                            </Border>
+
+                            <Border
+                                CornerRadius="14"
+                                Background="#12FFFFFF">
+
+                                <Grid Margin="16,0">
+                                    <TextBlock
+                                        Text="FILES"
+                                        Foreground="#6FFFFFFF"
+                                        FontSize="13"
+                                        VerticalAlignment="Center"/>
+
+                                    <TextBlock
+                                        x:Name="FileCountText"
+                                        Text="0"
+                                        Foreground="#F0FFFFFF"
+                                        FontSize="24"
+                                        HorizontalAlignment="Right"
+                                        VerticalAlignment="Center"/>
+                                </Grid>
+                            </Border>
+
+                        </UniformGrid>
+                    </Grid>
+                </Border>
+            </Grid>
+
+        </Grid>
+    </Grid>
+</Window>

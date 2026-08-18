@@ -1,0 +1,339 @@
+<UserControl x:Class="NexOverlay.App.ClipsView"
+             FontFamily="/NexOverlay.App;component/Assets/Fonts/#Copperplate"
+             FontWeight="Normal"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:svgc="http://sharpvectors.codeplex.com/svgc/">
+
+    <UserControl.Resources>
+
+        <Style x:Key="ClipActionButtonStyle"
+               TargetType="Button">
+            <Setter Property="Foreground" Value="#D8FFFFFF"/>
+            <Setter Property="Background" Value="#13FFFFFF"/>
+            <Setter Property="BorderBrush" Value="#24FFFFFF"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="8"/>
+            <Setter Property="Cursor" Value="Hand"/>
+
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Root"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="10">
+
+                            <ContentPresenter
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"/>
+                        </Border>
+
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver"
+                                     Value="True">
+                                <Setter TargetName="Root"
+                                        Property="Background"
+                                        Value="#20FFFFFF"/>
+                                <Setter TargetName="Root"
+                                        Property="BorderBrush"
+                                        Value="#62FFB8D8"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+    
+        <Style x:Key="PinClipButtonStyle"
+               TargetType="Button"
+               BasedOn="{StaticResource ClipActionButtonStyle}">
+            <Setter Property="BorderBrush" Value="#34FFFFFF"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="ToolTip" Value="Pin clip"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsPinned}" Value="True">
+                    <Setter Property="Background" Value="#2EA9D8FF"/>
+                    <Setter Property="BorderBrush" Value="#C3A9D8FF"/>
+                    <Setter Property="BorderThickness" Value="1.4"/>
+                    <Setter Property="ToolTip" Value="Pinned"/>
+                    <Setter Property="Effect">
+                        <Setter.Value>
+                            <DropShadowEffect Color="#A9D8FF"
+                                              BlurRadius="18"
+                                              ShadowDepth="0"
+                                              Opacity="0.7"
+                                              RenderingBias="Performance"/>
+                        </Setter.Value>
+                    </Setter>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style></UserControl.Resources>
+
+    <Border Margin="28"
+            CornerRadius="28"
+            Background="#F011151C"
+            BorderBrush="#42FFFFFF"
+            BorderThickness="1">
+
+        <Border.Effect>
+            <DropShadowEffect
+                BlurRadius="42"
+                ShadowDepth="10"
+                Direction="270"
+                Opacity="0.54"
+                Color="#D0000000"/>
+        </Border.Effect>
+
+        <Grid Margin="24">
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="12"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="12"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="14"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Button Width="40"
+                        Height="40"
+                        Style="{StaticResource ClipActionButtonStyle}"
+                        Click="BackButton_OnClick"
+                        ToolTip="Back">
+
+                    <svgc:SvgViewbox
+                        Width="17"
+                        Height="17"
+                        Source="/Assets/Icons/arrow-left.svg"/>
+                </Button>
+
+                <StackPanel Grid.Column="1"
+                            Margin="16,0,0,0"
+                            VerticalAlignment="Center">
+
+                    <TextBlock
+                        Text="CLIPS"
+                        Foreground="#F2FFFFFF"
+                        FontSize="19"
+                        FontWeight="SemiBold"/>
+
+                    <TextBlock
+                        x:Name="CountText"
+                        Text="0 saved"
+                        Margin="0,4,0,0"
+                        Foreground="#62FFFFFF"
+                        FontSize="13"/>
+                </StackPanel>
+            </Grid>
+
+            <Border x:Name="HistoryBanner"
+                    Grid.Row="2"
+                    CornerRadius="14"
+                    Background="#18FFB8D8"
+                    BorderBrush="#46FFB8D8"
+                    BorderThickness="1"
+                    Padding="14,11"
+                    Visibility="Collapsed">
+
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock
+                            x:Name="HistoryTitle"
+                            Text="WINDOWS CLIPBOARD HISTORY IS OFF"
+                            Foreground="#F2FFFFFF"
+                            FontSize="12"
+                            FontWeight="SemiBold"/>
+
+                        <TextBlock
+                            x:Name="HistoryDescription"
+                            Margin="0,5,16,0"
+                            Text="Enable it in Windows Settings for the full clipboard-history experience."
+                            Foreground="#8FFFFFFF"
+                            FontSize="11"
+                            TextWrapping="Wrap"/>
+                    </StackPanel>
+
+                    <Button Grid.Column="1"
+                            Height="36"
+                            MinWidth="122"
+                            Padding="10,0"
+                            Style="{StaticResource ClipActionButtonStyle}"
+                            Click="OpenClipboardSettings_OnClick">
+
+                        <StackPanel Orientation="Horizontal">
+                            <svgc:SvgViewbox
+                                Width="14"
+                                Height="14"
+                                Source="/Assets/Icons/settings.svg"/>
+
+                            <TextBlock
+                                Margin="7,0,0,0"
+                                Text="OPEN SETTINGS"
+                                FontSize="11"
+                                VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                </Grid>
+            </Border>
+
+            <Border Grid.Row="4"
+                    Height="50"
+                    CornerRadius="16"
+                    Background="#11161C24"
+                    BorderBrush="#20FFFFFF"
+                    BorderThickness="1">
+
+                <Grid Margin="15,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <svgc:SvgViewbox
+                        Width="15"
+                        Height="15"
+                        VerticalAlignment="Center"
+                        Source="/Assets/Icons/search.svg"/>
+
+                    <TextBox
+                        x:Name="SearchBox"
+                        Grid.Column="1"
+                        Margin="11,0,0,0"
+                        VerticalContentAlignment="Center"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        Foreground="#E5FFFFFF"
+                        CaretBrush="White"
+                        FontSize="13"
+                        TextChanged="SearchBox_OnTextChanged"/>
+                </Grid>
+            </Border>
+
+            <ScrollViewer Grid.Row="6"
+                          VerticalScrollBarVisibility="Hidden"
+                          HorizontalScrollBarVisibility="Disabled">
+
+                <ItemsControl x:Name="ClipList">
+
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+
+                            <Border Margin="0,0,0,9"
+                                    Padding="14,12"
+                                    CornerRadius="14"
+                                    Background="#13171D25"
+                                    BorderBrush="#20FFFFFF"
+                                    BorderThickness="1">
+
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="14"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <StackPanel>
+                                        <TextBlock
+                                            Text="{Binding Preview}"
+                                            Foreground="#E8FFFFFF"
+                                            FontSize="13"
+                                            TextWrapping="Wrap"
+                                            MaxWidth="520"/>
+
+                                        <TextBlock
+                                            Text="{Binding UpdatedAt}"
+                                            Margin="0,7,0,0"
+                                            Foreground="#52FFFFFF"
+                                            FontSize="10"/>
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Column="2"
+                                                Orientation="Horizontal"
+                                                VerticalAlignment="Center">
+
+                                        <Button
+                                            Tag="{Binding}"
+                                            Width="34"
+                                            Height="34"
+                                            Margin="0,0,7,0"
+                                            Style="{StaticResource PinClipButtonStyle}"
+                                            Click="PinButton_OnClick"
+                                            ToolTip="Pin / unpin">
+
+                                            <svgc:SvgViewbox
+                                                Width="14"
+                                                Height="14"
+                                                Source="/Assets/Icons/pin.svg"/>
+                                        </Button>
+
+                                        <Button
+                                            Tag="{Binding}"
+                                            Width="34"
+                                            Height="34"
+                                            Margin="0,0,7,0"
+                                            Style="{StaticResource ClipActionButtonStyle}"
+                                            Click="CopyButton_OnClick"
+                                            ToolTip="Copy">
+
+                                            <svgc:SvgViewbox
+                                                Width="14"
+                                                Height="14"
+                                                Source="/Assets/Icons/copy.svg"/>
+                                        </Button>
+
+                                        <Button
+                                            Tag="{Binding}"
+                                            Width="34"
+                                            Height="34"
+                                            Style="{StaticResource ClipActionButtonStyle}"
+                                            Click="DeleteButton_OnClick"
+                                            ToolTip="Delete">
+
+                                            <svgc:SvgViewbox
+                                                Width="14"
+                                                Height="14"
+                                                Source="/Assets/Icons/trash-2.svg"/>
+                                        </Button>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+
+            <TextBlock
+                x:Name="EmptyText"
+                Grid.Row="6"
+                Text="Clipboard history is empty."
+                Foreground="#5CFFFFFF"
+                FontSize="13"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Visibility="Collapsed"/>
+
+            <TextBlock
+                x:Name="StatusText"
+                Grid.Row="7"
+                Margin="2,10,0,0"
+                Foreground="#62FFFFFF"
+                FontSize="11"/>
+        </Grid>
+    </Border>
+</UserControl>

@@ -1,0 +1,50 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Windows / .NET 10
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore
+        run: dotnet restore NexOverlay.slnx
+
+      - name: Build Debug
+        run: dotnet build NexOverlay.slnx -c Debug --no-restore
+
+      - name: Build Release
+        run: dotnet build NexOverlay.slnx -c Release --no-restore
+
+      - name: Publish win-x64
+        run: >
+          dotnet publish NexOverlay.App/NexOverlay.App.csproj
+          -c Release
+          -r win-x64
+          --self-contained true
+          -o artifacts/win-x64
+
+      - name: Upload win-x64 artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: NexOverlay-win-x64
+          path: artifacts/win-x64
+          if-no-files-found: error
+          retention-days: 14

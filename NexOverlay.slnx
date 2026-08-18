@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="NexOverlay.App/NexOverlay.App.csproj" />
+  <Project Path="NexOverlay.Core/NexOverlay.Core.csproj" />
+  <Project Path="NexOverlay.Storage/NexOverlay.Storage.csproj" />
+  <Project Path="NexOverlay.Windows/NexOverlay.Windows.csproj" />
+</Solution>
