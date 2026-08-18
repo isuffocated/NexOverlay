@@ -1,26 +1,81 @@
+<div align="center">
+
 # NexOverlay
 
-A Windows desktop overlay for fast access to notes, snippets, files and clipboard history without leaving the current workspace.
+**A local-first Windows overlay for notes, snippets, files and clipboard history.**
 
-NexOverlay is built with C# / .NET 10 and WPF.
+Open your workspace without leaving the app, game, editor or browser you are currently using.
 
-## Features
+[![CI](https://github.com/isuffocated/NexOverlay/actions/workflows/ci.yml/badge.svg)](https://github.com/isuffocated/NexOverlay/actions/workflows/ci.yml)
 
-- Global `CapsLock + Space` overlay gesture.
-- Multi-monitor aware opening on the monitor under the cursor.
-- Notes with local persistence.
-- Snippets with search, editing and copy actions.
-- File links with open and reveal-in-Explorer actions.
-- Clipboard history with pinning, search and copy.
-- Command palette for opening modules, running actions and searching workspace content.
-- Recent activity and workspace counters.
-- First-run guided tutorial.
-- Switchable animated backgrounds:
-  - Aurora
-  - Particles
-- Local-first storage using SQLite.
+</div>
 
-## How it works
+<p align="center">
+  <img src="docs/screenshots/01-home-aurora.png" alt="NexOverlay home screen with Aurora background" width="100%">
+</p>
+
+## What is NexOverlay?
+
+NexOverlay is a Windows desktop overlay built with **C# / .NET 10 / WPF**.
+
+It provides a fast workspace for things that normally end up scattered across Notepad, browser tabs, Explorer windows and clipboard history.
+
+The overlay stays out of the way until it is needed, then opens on the monitor currently under the cursor.
+
+### Core modules
+
+- **Notes** - create, edit, search and delete local notes.
+- **Snippets** - store reusable text/code with categories and quick copy actions.
+- **Files** - keep shortcuts to frequently used files without moving or duplicating them.
+- **Clips** - searchable clipboard history with pinning, copy and delete actions.
+
+Everything is stored locally.
+
+## Command palette
+
+The central search field doubles as a command palette.
+
+It can:
+
+- open NexOverlay modules;
+- create new notes and snippets;
+- add files;
+- search Notes, Snippets, Files and Clips;
+- surface actions and matching workspace content from one place.
+
+<p align="center">
+  <img src="docs/screenshots/02-search.png" alt="NexOverlay command palette" width="92%">
+</p>
+
+## Clipboard history
+
+Clips keeps recent clipboard entries inside NexOverlay and lets you search, copy, pin or remove them.
+
+Pinned entries stay available while the unpinned history is automatically bounded.
+
+<p align="center">
+  <img src="docs/screenshots/03-clips.png" alt="NexOverlay clipboard history" width="92%">
+</p>
+
+## Snippets
+
+Snippets are intended for content you want to reuse repeatedly: commands, code, templates, URLs, messages or anything else worth keeping close.
+
+<p align="center">
+  <img src="docs/screenshots/04-snippets.png" alt="NexOverlay snippets module" width="92%">
+</p>
+
+## Guided onboarding
+
+The first overlay session includes a contextual tutorial that highlights the actual UI and demonstrates the main areas of NexOverlay.
+
+Debug builds also expose a replay button for testing the onboarding flow.
+
+<p align="center">
+  <img src="docs/screenshots/05-tutorial.png" alt="NexOverlay guided tutorial" width="92%">
+</p>
+
+## Opening the overlay
 
 Press:
 
@@ -28,64 +83,126 @@ Press:
 CapsLock + Space
 ```
 
-A small handle appears at the top-center of the active monitor. Hover it to open NexOverlay.
+A small handle appears at the top-center of the monitor under the cursor.
 
-Use the same gesture again while the overlay is open to arm the close handle.
+Hover the handle to open NexOverlay.
 
-## Data
+While NexOverlay is open, use the same chord again to arm the close handle.
 
-Mutable data is stored locally under:
+## Background themes
+
+NexOverlay currently includes two animated backgrounds:
+
+- **Aurora** - slowly drifting soft gradient lights.
+- **Particles** - an animated particle network.
+
+The selected background persists between sessions.
+
+## Local-first storage
+
+NexOverlay does not require an account or cloud backend.
+
+Mutable application data is stored under:
 
 ```text
 %LocalAppData%\NexOverlay
 ```
 
-This includes the SQLite database, cached data and local assets.
+The application uses SQLite for structured data. Large assets are stored as files rather than database blobs.
 
-NexOverlay does not require an account or cloud backend.
+Typical local data includes:
 
-## Build
+```text
+%LocalAppData%\NexOverlay\
+|-- nexoverlay.db
+|-- assets\
+`-- cache\
+```
 
-Requirements:
+## Build from source
 
-- Windows 10/11
+### Requirements
+
+- Windows 10 or Windows 11
 - .NET 10 SDK
 
-Clone and build:
+Clone:
 
 ```powershell
 git clone https://github.com/isuffocated/NexOverlay.git
 cd NexOverlay
+```
+
+Build Release:
+
+```powershell
 dotnet build NexOverlay.slnx -c Release
 ```
 
-Run the application from Visual Studio or:
+Run:
 
 ```powershell
 dotnet run --project NexOverlay.App
 ```
 
-## CI
+## Continuous integration
 
-Every push and pull request to `main` is built on GitHub Actions using a Windows runner.
+GitHub Actions builds NexOverlay on Windows for every push and pull request to `main`.
 
-The workflow verifies both Debug and Release configurations and publishes a self-contained `win-x64` artifact.
+The CI pipeline performs:
+
+```text
+Restore
+-> Debug build
+-> Release build
+-> Self-contained win-x64 publish
+-> GitHub Actions artifact
+```
+
+This means the downloadable CI artifact is built by GitHub Actions directly from the repository contents.
 
 ## Project structure
 
 ```text
-NexOverlay.App       WPF UI and application lifecycle
-NexOverlay.Core      shared domain models
-NexOverlay.Storage   SQLite persistence
-NexOverlay.Windows   Windows-specific integrations
+NexOverlay/
+|-- NexOverlay.App/       WPF UI, overlay lifecycle and modules
+|-- NexOverlay.Core/      shared domain models
+|-- NexOverlay.Storage/   SQLite persistence
+|-- NexOverlay.Windows/   Windows-specific integrations
+|-- docs/
+|   `-- screenshots/
+`-- .github/
+    `-- workflows/
 ```
 
-## Status
+## Current status
 
-NexOverlay is currently in beta.
+NexOverlay is currently in **beta**.
 
-The current focus is stability, interaction polish and packaging for the first public release.
+The current focus is:
+
+- stability;
+- interaction and animation polish;
+- packaging;
+- installer/release automation;
+- improving the command palette and workspace workflow.
+
+## Platform
+
+NexOverlay is currently **Windows-only**.
 
 ## License
 
-No open-source license has been granted yet. All rights reserved unless a license is added later.
+No open-source license has been granted yet.
+
+Unless a license is added later, the source code remains **all rights reserved**.
+
+---
+
+<div align="center">
+
+**NexOverlay**
+
+Fast access to the small things that interrupt the current workflow.
+
+</div>
